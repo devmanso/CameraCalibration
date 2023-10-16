@@ -6,6 +6,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.highgui.HighGui;
+import org.opencv.videoio.Videoio;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,16 +39,23 @@ public class Main {
         objectP3D.put(0, 0, objBuff);
 
         VideoCapture capture = new VideoCapture(0);
+        double frameWidth;
+        double frameHeight;
+
+        //capture.set(3, 1280);
+        //capture.set(4, 720);
 
         MatOfPoint2f corners = new MatOfPoint2f();
 
         Mat image = new Mat();
         int currentFrame = 0;
         while (true) {
+            //frameWidth = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
+            //frameHeight = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
             currentFrame +=1;
             System.out.println(currentFrame);
             capture.read(image);
-            if(currentFrame == 50) {}
+            if(currentFrame == 50) {break;}
             Mat gray = new Mat();
             Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
             //Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);
@@ -61,6 +70,7 @@ public class Main {
                 imagePoints.add(corners2);
                 objectPoints.add(objectP3D);
                 Calib3d.drawChessboardCorners(image, boardSize, corners, found);
+
             }
 
             HighGui.imshow("Camera Calibration", image);
@@ -74,6 +84,12 @@ public class Main {
         HighGui.destroyAllWindows();
 
         Size imageSize = new Size(image.width(), image.height());
+
+        //System.out.println("capture resolution");
+        //System.out.println(frameWidth + " x " + frameHeight);
+
+        System.out.println("Image Width "+ image.width());
+        System.out.println("Image Height "+ image.height());
 
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_64F);
         MatOfDouble distortionCoefficients = new MatOfDouble();
@@ -98,11 +114,6 @@ public class Main {
             System.out.println(tvec.dump());
         }
     }
-
-
-
-
-
 
 }
 
