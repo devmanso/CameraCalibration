@@ -6,7 +6,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.highgui.HighGui;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +14,11 @@ public class Main {
     public static void main(String[] args) {
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        int CHECKERBOARD_COLS = 8;
+        int CHECKERBOARD_COLS = 4;
         int CHECKERBOARD_ROWS = 6;
         Size boardSize = new Size(CHECKERBOARD_COLS, CHECKERBOARD_ROWS);
 
-        // modify epsillon maybe?
-        TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 12, 0.5);
+        TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 30, 0.3);
 
         List<Mat> objectPoints = new ArrayList<>();
         List<Mat> imagePoints = new ArrayList<>();
@@ -38,9 +36,6 @@ public class Main {
         }
         objectP3D.put(0, 0, objBuff);
 
-
-
-
         VideoCapture capture = new VideoCapture(0);
 
         MatOfPoint2f corners = new MatOfPoint2f();
@@ -49,15 +44,16 @@ public class Main {
         int currentFrame = 0;
         while (true) {
             currentFrame +=1;
-            //System.out.println(currentFrame);
+            System.out.println(currentFrame);
             capture.read(image);
-
+            if(currentFrame == 50) {}
             Mat gray = new Mat();
             Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
-
+            //Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);
             boolean found = Calib3d.findChessboardCorners(gray, boardSize, corners);
 
             if (found) {
+                System.out.println("checkerboard found");
                 Mat corners2 = new Mat();
                 Imgproc.cornerSubPix(gray, corners, new Size(11, 11), new Size(-1, -1), criteria);
                 corners2.release();
@@ -67,15 +63,8 @@ public class Main {
                 Calib3d.drawChessboardCorners(image, boardSize, corners, found);
             }
 
-            // Draw a square in the middle of the video feed
-//            int squareSize = 50;
-//            int centerX = image.width() / 2;
-//            int centerY = image.height() / 2;
-//            Imgproc.rectangle(image, new Point(centerX - squareSize / 2, centerY - squareSize / 2),
-//                    new Point(centerX + squareSize / 2, centerY + squareSize / 2), new Scalar(0, 255, 0),2);
-
             HighGui.imshow("Camera Calibration", image);
-            if (HighGui.waitKey(1) == 'q') {
+            if (HighGui.waitKey(1) == 27) {
                 break;
             }
 
@@ -109,5 +98,11 @@ public class Main {
             System.out.println(tvec.dump());
         }
     }
+
+
+
+
+
+
 }
 
